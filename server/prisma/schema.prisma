@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String          @id @default(cuid())
+  email              String          @unique
+  name               String
+  registrationNumber String?
+  department         String?
+  course             String?
+  yearOfStudy        Int?
+  role               String          @default("student")
+  passwordHash       String
+  createdAt          DateTime        @default(now())
+  profile            StudentProfile?
+  assessments       Assessment[]
+  interventions     Intervention[]
+}
+
+model StudentProfile {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id])
+  studentId            String?
+  course              String?
+  department          String?
+  yearOfStudy         Int?
+  semester            String?
+  previousSemesterGpa Float?
+  currentSemesterAverage Float?
+  catPerformance      Float?
+  attendanceRate      Float?
+  assignmentCompletion Float?
+  studyHours          Float?
+  previousExamsFailures Int?
+  financialRisk       Int?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Assessment {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  riskScore        Float
+  riskLevel        String
+  summary          String
+  recommendations  String
+  aiExplanation    String
+  createdAt        DateTime @default(now())
+}
+
+model Intervention {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  type       String
+  notes      String
+  createdAt  DateTime @default(now())
+}
